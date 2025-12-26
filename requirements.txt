@@ -1,0 +1,128 @@
+﻿# ==============================================================================
+# Requirements File for: Who Connects Global Aid? Network Analysis Framework
+# ==============================================================================
+# 
+# This requirements file specifies all production dependencies for the
+# implementation of the bipartite network projection, node embedding, and
+# topological analysis pipeline described in McCarthy et al. (2025).
+#
+# Installation: pip install -r requirements.txt
+# Python Version: >=3.8,<3.12 (Numba compatibility constraint)
+#
+# Paper Reference:
+# McCarthy, P. X., Gong, X., Rizoiu, M.-A., & Boldi, P. (2025). 
+# Who Connects Global Aid? The Hidden Geometry of 10 Million Transactions. 
+# arXiv:2512.17243
+#
+# Author: CS Chirinda
+# Version: 1.0.0
+# ==============================================================================
+
+# ------------------------------------------------------------------------------
+# Core Scientific Computing Stack
+# ------------------------------------------------------------------------------
+# NumPy: Fundamental package for numerical computing with N-dimensional arrays
+# Used for: Sparse matrix operations, eigenvalue computations, vector algebra
+numpy>=1.24.0,<2.0.0
+
+# Pandas: High-performance data manipulation and ETL pipeline implementation
+# Used for: Transaction record processing, DataFrame operations, time-series handling
+pandas>=2.0.0,<3.0.0
+
+# SciPy: Scientific computing library for sparse matrices and statistical functions
+# Used for: CSR/CSC sparse adjacency matrices, spectral decomposition, correlation analysis
+scipy>=1.10.0,<2.0.0
+
+# ------------------------------------------------------------------------------
+# Network Science & Graph Theory
+# ------------------------------------------------------------------------------
+# NetworkX: Comprehensive graph theory and network analysis library
+# Used for: Graph construction, centrality metrics (betweenness, hub scores, HITS algorithm)
+# Required algorithms: Brandes' betweenness, HITS (Hyperlink-Induced Topic Search)
+networkx>=3.0,<4.0
+
+# ------------------------------------------------------------------------------
+# Machine Learning & Natural Language Processing
+# ------------------------------------------------------------------------------
+# Gensim: Topic modeling and document similarity with optimized Word2Vec
+# Used for: Node2Vec implementation via Word2Vec Skip-gram architecture
+# Critical for: Biased random walk embeddings, stochastic gradient descent optimization
+gensim>=4.3.0,<5.0.0
+
+# Scikit-learn: Machine learning library with text processing utilities
+# Used for: TF-IDF vectorization for entity resolution blocking, cosine similarity computation
+# Critical algorithms: Sparse matrix cosine similarity, TfidfVectorizer for string matching
+scikit-learn>=1.3.0,<2.0.0
+
+# ------------------------------------------------------------------------------
+# High-Performance Computing & JIT Compilation
+# ------------------------------------------------------------------------------
+# Numba: Just-In-Time compiler for numerical Python functions
+# Used for: Accelerating random walk generation in Node2Vec (10-100x speedup)
+# Critical for: Nested loop optimization in biased walk sampling, avoiding Python interpreter overhead
+# Note: Version constraint due to LLVM compatibility requirements
+numba>=0.57.0,<0.60.0
+
+# LLVM Lite: Lightweight LLVM Python binding (required by Numba)
+# Version must align with Numba's LLVM backend requirements
+llvmlite>=0.40.0,<0.43.0
+
+# ------------------------------------------------------------------------------
+# Manifold Learning & Dimensionality Reduction
+# ------------------------------------------------------------------------------
+# UMAP-Learn: Uniform Manifold Approximation and Projection
+# Used for: Reducing 100D Node2Vec embeddings to 2D for Solar System visualization
+# Mathematical basis: Riemannian geometry, fuzzy simplicial sets, cross-entropy optimization
+# Critical parameters: n_neighbors (local/global balance), min_dist (cluster separation)
+umap-learn>=0.5.3,<1.0.0
+
+# PyNNDescent: Fast approximate nearest neighbor search (dependency of UMAP)
+# Used internally by UMAP for k-NN graph construction on high-dimensional embeddings
+pynndescent>=0.5.10,<1.0.0
+
+# ------------------------------------------------------------------------------
+# Supporting Dependencies (Automatically Installed by Above)
+# ------------------------------------------------------------------------------
+# The following are explicitly listed for version control and transparency:
+
+# Joblib: Parallel computing library (used by scikit-learn and UMAP)
+joblib>=1.3.0,<2.0.0
+
+# Tqdm: Progress bar library for long-running computations
+# Used for: Visualizing ETL pipeline progress, random walk generation status
+tqdm>=4.65.0,<5.0.0
+
+# ------------------------------------------------------------------------------
+# Optional: Development & Validation Dependencies
+# ------------------------------------------------------------------------------
+# Uncomment below for development environment with testing and visualization
+
+# pytest>=7.4.0,<8.0.0              # Unit testing framework
+# pytest-cov>=4.1.0,<5.0.0          # Test coverage reporting
+# matplotlib>=3.7.0,<4.0.0          # Static visualization for validation plots
+# seaborn>=0.12.0,<1.0.0            # Statistical data visualization
+# plotly>=5.14.0,<6.0.0             # Interactive Solar System visualization
+# ipython>=8.12.0,<9.0.0            # Enhanced REPL for exploratory analysis
+# jupyter>=1.0.0,<2.0.0             # Notebook interface for sensitivity analysis
+
+# ------------------------------------------------------------------------------
+# Platform-Specific Notes
+# ------------------------------------------------------------------------------
+# 
+# macOS (Apple Silicon M1/M2):
+# - Install miniforge3 for native ARM64 builds
+# - Use: OPENBLAS="$(brew --prefix openblas)" pip install numpy scipy
+#
+# Linux (CUDA-enabled systems):
+# - For GPU-accelerated UMAP: pip install cuml-cu11 (requires RAPIDS)
+# - For large-scale graph operations: Consider graph-tool or networkit
+#
+# Windows:
+# - Pre-compiled wheels available via: pip install --only-binary :all:
+# - Numba may require Visual Studio Build Tools for C++ extensions
+#
+# Memory Requirements:
+# - Minimum 18GB RAM for N=2,456 nodes with 10M transactions
+# - Recommended 32GB+ for sensitivity analysis with multiple parameter sweeps
+#
+# ==============================================================================
