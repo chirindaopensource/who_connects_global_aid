@@ -1,0 +1,140 @@
+﻿# =============================================================================
+# MASTER STUDY CONFIGURATION: "Who Connects Global Aid?"
+# =============================================================================
+# NOTE: This config contains method inputs only (no observed outputs).
+# =============================================================================
+
+# -------------------------------------------------------------------------
+# PART I: INPUT DATA OBJECTS
+# -------------------------------------------------------------------------
+INPUT_DATASETS:
+  df_transactions_raw:
+    required: true
+  df_activities_raw:
+    required: true
+  df_organisations_raw:
+    required: true
+  df_web_links_raw:
+    required: true
+    description: "Required to reproduce the reported web validation"
+  df_exchange_rates_raw:
+    required: false
+    description: "Optional extension only"
+
+# -------------------------------------------------------------------------
+# PART II: SCOPE AND BASELINE FILTERS (paper-stated)
+# -------------------------------------------------------------------------
+SCOPE:
+  start_year: 1967
+  end_year: 2025
+
+TRANSACTION_FILTERS:
+  # Paper-stated constraint: "nonzero financial transactions"
+  # For faithful replication, define it as strictly positive.
+  value_filter:
+    rule: "V > 0"
+  # Transaction type filtering is NOT specified in the manuscript; keep all by default.
+  transaction_type_filter:
+    enabled: false
+    included_codes: null
+
+# -------------------------------------------------------------------------
+# PART III: ENTITY RESOLUTION (paper-stated in principle; details must be fixed)
+# -------------------------------------------------------------------------
+ENTITY_RESOLUTION:
+  enabled: true
+  match_on_fields:
+    - "org_name"  # names, not just refs
+  fuzzy_matching:
+    metric: "UNSPECIFIED_IN_PAPER"
+    threshold: "UNSPECIFIED_IN_PAPER"
+    blocking_strategy: "UNSPECIFIED_IN_PAPER"
+  manual_overrides:
+    enabled: true
+    override_table_expected: true  # e.g., curated alias->canonical mappings
+
+# -------------------------------------------------------------------------
+# PART IV: NETWORK ARCHITECTURE (paper-stated)
+# -------------------------------------------------------------------------
+NETWORKS:
+  bipartite_graph:
+    node_sets:
+      U: "Provider organisations"
+      V: "Receiver organisations"
+    # Required decision for strict bipartite validity if orgs appear in both roles.
+    role_split:
+      enabled: true
+      provider_suffix: "::PROVIDER"
+      receiver_suffix: "::RECEIVER"
+    edge_definition: "Edge exists if a transaction occurs between provider and receiver"
+
+  projection:
+    target: "Providers"
+    context_definition:
+      # Paper says: same receiver country OR sector. Exact choice must be fixed.
+      use_country: true
+      use_sector: true
+      combine_country_and_sector: false  # if True, context = (country, sector)
+    weighting: "frequency_of_cooccurrence"
+    remove_self_loops: true
+
+# -------------------------------------------------------------------------
+# PART V: REPRESENTATION LEARNING AND GEOMETRY (paper-stated where specified)
+# -------------------------------------------------------------------------
+NODE2VEC:
+  dimensions: 100
+  hyperparameters: "UNSPECIFIED_IN_PAPER"  # p, q, walk_length, num_walks, window_size must be recorded
+  random_seed: "MUST_BE_FIXED_AND_RECORDED"
+
+UMAP:
+  n_neighbors: 15
+  min_dist: 0.1
+  metric: "cosine"
+  n_components: 2
+  random_state: "MUST_BE_FIXED_AND_RECORDED"
+
+# -------------------------------------------------------------------------
+# PART VI: CENTRALITY AND BROKERAGE (paper-stated)
+# -------------------------------------------------------------------------
+CENTRALITY:
+  compute_degree: true
+  compute_betweenness: true
+  compute_hub_score_hits: true
+  betweenness_shortest_path_assumption: true
+
+# -------------------------------------------------------------------------
+# PART VII: SOLAR SYSTEM VISUALIZATION INPUT DEFINITIONS (paper-stated)
+# -------------------------------------------------------------------------
+SOLAR_SYSTEM:
+  top_n_display: 100
+  core_n: 25
+  ranking_metric: "hub_score_hits"  # consistent with Results narrative
+  node_size_metric: "transaction_count"  # consistent with paper text (NOT USD volume)
+
+# -------------------------------------------------------------------------
+# PART VIII: VALIDATION AGAINST WEB METRICS (paper-stated)
+# -------------------------------------------------------------------------
+VALIDATION:
+  external_metric: "website_pagerank"
+  correlation:
+    method: "pearson"
+    reported_r: 0.48
+
+# -------------------------------------------------------------------------
+# PART IX: OPTIONAL EXTENSIONS (not required by the manuscript’s baseline)
+# -------------------------------------------------------------------------
+OPTIONAL_EXTENSIONS:
+  usd_normalization:
+    enabled: false
+    fx_join_rule: "MUST_BE_EXPLICIT_IF_ENABLED"
+    rate_convention: "MUST_BE_EXPLICIT_IF_ENABLED"
+  scale_approximation:
+    hyperanf_enabled: "AS_NEEDED_FOR_SCALE"
+    parameters: "UNSPECIFIED_IN_PAPER"
+
+# -------------------------------------------------------------------------
+# PART X: LLM SETTINGS (explicitly none; manuscript does not use LLMs)
+# -------------------------------------------------------------------------
+LLM_USAGE:
+  enabled: false
+  prompt_templates: null
