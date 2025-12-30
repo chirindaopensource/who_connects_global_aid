@@ -1,4 +1,5 @@
-"""# Paper
+"""
+# Paper
 
 Title: "*Who Connects Global Aid? The Hidden Geometry of 10 Million Transactions*"
 
@@ -115,7 +116,7 @@ LOGGER: logging.Logger = logging.getLogger(__name__)
 # API Key
 # ==============================================================================
 
-# Set API Key International Aid Transparency Initiative "Full Access" API Key. Subscribe here: https://developer.iatistandard.org/
+# Set API Key. It is the International Aid Transparency Initiative "Full Access" API Key. You can subscribe here: https://developer.iatistandard.org/
 os.environ["IATI_SUBSCRIPTION_KEY"] = "paste_api_key_here"
 
 # ==============================================================================
